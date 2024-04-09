@@ -47,7 +47,7 @@ def advertisement_detail(request, pk):
         form = ResponseForm(request.POST)
         if form.is_valid():
             response = form.save(commit=False)
-            response.responder = request.user  # Указываем текущего пользователя как автора респонса
+            response.responder = request.user
             response.advertisement = advertisement
             response.save()
             return redirect('advertisement_detail', pk=pk)
@@ -70,10 +70,10 @@ def create_response(request, advertisement_id):
             response.advertisement = advertisement
             response.save()
 
-            # Отправка уведомления по электронной почте
+
             subject = f'Новый отклик на ваше объявление "{advertisement.title}"'
             message = f'Пользователь {request.user.username} оставил новый отклик на ваше объявление "{advertisement.title}":\n\n{response.text}'
-            sender_email = 'your_email@example.com'  # Замените на свой адрес электронной почты
+            sender_email = 'goriinmaksim@yandex.ru'
             recipient_email = advertisement.creator.email
             send_mail(subject, message, sender_email, [recipient_email])
 
@@ -95,13 +95,11 @@ def advertisement_list(request, category=None):
 def index(request):
     advertisements = Advertisement.objects.all()
     advertisement_data = []
-    category_filter_form = CategoryFilterForm()  # Определение переменной вне условия, чтобы она была доступна в любом случае
+    category_filter_form = CategoryFilterForm()
 
     if request.method == 'GET':
-        # Если форма была отправлена методом GET
         category_filter_form = CategoryFilterForm(request.GET)
         if category_filter_form.is_valid():
-            # Если форма валидна, применяем фильтрацию
             category = category_filter_form.cleaned_data.get('category')
             if category:
                 advertisements = advertisements.filter(category=category)
@@ -136,12 +134,12 @@ def private_responses(request):
     return render(request, 'board/private_responses.html', {'user_responses': user_responses})
 
 
-def send_newsletter_to_users():
-    news_text = "Здесь ваш текст новости"
-    recipient_list = list(User.objects.values_list('email', flat=True))
-    subject = "Тема вашей новостной рассылки"
-    from_email = settings.EMAIL_HOST_USER
-    html_content = render_to_string('board/news.html', {'news_text': news_text})
-    msg = EmailMultiAlternatives(subject, strip_tags(news_text), from_email, recipient_list)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+# def send_newsletter_to_users():
+#     news_text = "Здесь ваш текст новости"
+#     recipient_list = list(User.objects.values_list('email', flat=True))
+#     subject = "Тема вашей новостной рассылки"
+#     from_email = settings.EMAIL_HOST_USER
+#     html_content = render_to_string('board/news.html', {'news_text': news_text})
+#     msg = EmailMultiAlternatives(subject, strip_tags(news_text), from_email, recipient_list)
+#     msg.attach_alternative(html_content, "text/html")
+#     msg.send()
